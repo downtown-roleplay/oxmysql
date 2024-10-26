@@ -14,11 +14,6 @@ dependencies {
 client_script 'ui.lua'
 server_script 'dist/build.js'
 
-files {
-}
-
-ui_page 'web/build/index.html'
-
 provide 'mysql-async'
 provide 'ghmattimysql'
 
