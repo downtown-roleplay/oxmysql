@@ -16,7 +16,7 @@ export const rawExecute = async (
   cb?: CFXCallback,
   isPromise?: boolean,
   unpack?: boolean,
-  connectionId?: number
+  connectionId?: number,
 ) => {
   cb = setCallback(parameters, cb);
 
@@ -31,7 +31,7 @@ export const rawExecute = async (
     return logError(invokingResource, cb, isPromise, err, query, parameters);
   }
 
-  using connection = await getConnection(connectionId);
+  await using connection = await getConnection(connectionId);
 
   if (!connection) return;
 

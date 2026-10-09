@@ -1,7 +1,8 @@
 import type { ConnectionOptions } from 'mysql2';
 import { typeCast } from './utils/typeCast';
 
-export const mysql_connection_string = GetConvar('mysql_connection_string', '');
+export const mysql_connection_string =
+  GetConvar('mysql_connection_string', '') || process.env.DB_CONNECTION || 'mysql://root@localhost';
 export let mysql_ui = GetConvar('mysql_ui', 'false') === 'true';
 export let mysql_slow_query_warning = GetConvarInt('mysql_slow_query_warning', 200);
 export let mysql_debug: boolean | string[] = false;
@@ -24,9 +25,9 @@ export function setDebug() {
   mysql_log_size = mysql_debug ? 10000 : GetConvarInt('mysql_log_size', 100);
 }
 
-export const mysql_transaction_isolation_level = (() => {
+export function getIsolationLevelStatement(level: number) {
   const query = 'SET TRANSACTION ISOLATION LEVEL';
-  switch (GetConvarInt('mysql_transaction_isolation_level', 2)) {
+  switch (level) {
     case 1:
       return `${query} REPEATABLE READ`;
     case 2:
@@ -38,13 +39,17 @@ export const mysql_transaction_isolation_level = (() => {
     default:
       return `${query} READ COMMITTED`;
   }
-})();
+}
+
+export const mysql_transaction_isolation_level = getIsolationLevelStatement(
+  GetConvarInt('mysql_transaction_isolation_level', 2),
+);
 
 function parseUri(connectionString: string) {
   const splitMatchGroups = connectionString.match(
     new RegExp(
-      '^(?:([^:/?#.]+):)?(?://(?:([^/?#]*)@)?([\\w\\d\\-\\u0100-\\uffff.%]*)(?::([0-9]+))?)?([^?#]+)?(?:\\?([^#]*))?$'
-    )
+      '^(?:([^:/?#.]+):)?(?://(?:([^/?#]*)@)?([\\w\\d\\-\\u0100-\\uffff.%]*)(?::([0-9]+))?)?([^?#]+)?(?:\\?([^#]*))?$',
+    ),
   ) as RegExpMatchArray;
 
   if (!splitMatchGroups) throw new Error(`mysql_connection_string structure was invalid (${connectionString})`);
@@ -70,10 +75,10 @@ function parseUri(connectionString: string) {
 
 export let convertNamedPlaceholders: null | ((query: string, parameters: Record<string, any>) => [string, any[]]);
 
-export function getConnectionOptions(): ConnectionOptions {
-  const options: Record<string, any> = mysql_connection_string.includes('mysql://')
-    ? parseUri(mysql_connection_string)
-    : mysql_connection_string
+export function getConnectionOptions(connectionString: string = mysql_connection_string): ConnectionOptions {
+  const options: Record<string, any> = connectionString.includes('mysql://')
+    ? parseUri(connectionString)
+    : connectionString
         .replace(/(?:host(?:name)|ip|server|data\s?source|addr(?:ess)?)=/gi, 'host=')
         .replace(/(?:user\s?(?:id|name)?|uid)=/gi, 'user=')
         .replace(/(?:pwd|pass)=/gi, 'password=')
@@ -139,5 +144,5 @@ RegisterCommand(
         return console.log(`^3Usage: oxmysql add|remove <resource>^0`);
     }
   },
-  true
+  true,
 );

@@ -19,32 +19,33 @@ export const startTransaction = async (
   invokingResource: string,
   queries: (...args: any[]) => Promise<boolean>,
   cb?: CFXCallback,
-  isPromise?: boolean
+  isPromise?: boolean,
 ) => {
-  using conn: MySql = await getConnection();
+  await using conn: MySql = await getConnection();
   let response: boolean | null = false;
   let closed = false;
 
   if (!conn) return;
 
-  setTimeout(() => (closed = true), 30000);
+  const timeout = setTimeout(() => (closed = true), 30000);
 
   try {
     await conn.beginTransaction();
 
-    const commit = await queries((sql: string, values: CFXParameters) =>
-      runQuery(closed ? null : conn, sql, values)
-    );
+    const commit = await queries((sql: string, values: CFXParameters) => runQuery(closed ? null : conn, sql, values));
 
     if (closed) throw new Error(`Transaction has timed out after 30 seconds.`);
 
     response = commit === false ? false : true;
-    
-    if (!response) conn.rollback();
+
+    if (response) await conn.commit();
+    else await conn.rollback();
   } catch (err: any) {
-    conn.rollback();
+    await conn.rollback().catch(() => {});
+    response = false;
     logError(invokingResource, cb, isPromise, err);
   } finally {
+    clearTimeout(timeout);
     closed = true;
   }
 
