@@ -7,8 +7,8 @@ import { performance } from 'perf_hooks';
 import { profileBatchStatements, runProfiler } from 'profiler';
 
 const transactionError = (queries: { query: string; params?: CFXParameters }[], parameters: CFXParameters) => {
-  return `${queries.map((query) => `${query.query} ${JSON.stringify(query.params || [])}`).join('\n')}\n${JSON.stringify(
-    parameters,
+  `${queries.map((query) => `${query.query} ${JSON.stringify(query.params || [])}`).join('\n')}\n${JSON.stringify(
+    parameters
   )}`;
 };
 
@@ -17,7 +17,7 @@ export const rawTransaction = async (
   queries: TransactionQuery,
   parameters: CFXParameters,
   cb?: CFXCallback,
-  isPromise?: boolean,
+  isPromise?: boolean
 ) => {
   let transactions;
   cb = setCallback(parameters, cb);
@@ -28,7 +28,7 @@ export const rawTransaction = async (
     return logError(invokingResource, cb, isPromise, err);
   }
 
-  await using connection = await getConnection();
+  using connection = await getConnection();
 
   if (!connection) return;
 

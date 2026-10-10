@@ -9,7 +9,7 @@ import fetch from 'node-fetch';
   if (!currentVersion) return;
 
   setTimeout(async () => {
-    const response = await fetch(`https://api.github.com/repos/overextended/oxmysql/releases/latest`).catch((err) => {
+    const response = await fetch(`https://api.github.com/repos/communityox/oxmysql/releases/latest`).catch((err) => {
       console.warn(`Failed to retrieve latest version of oxmysql (${err.code}).`);
     });
 
@@ -28,7 +28,7 @@ import fetch from 'node-fetch';
       if (current !== latest) {
         if (current < latest)
           return console.log(
-            `^3An update is available for ${resourceName} (current version: ${currentVersion[0]})\r\n${release.html_url}^0`,
+            `^3An update is available for ${resourceName} (current version: ${currentVersion[0]})\r\n${release.html_url}^0`
           );
         else break;
       }

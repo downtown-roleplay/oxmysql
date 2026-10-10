@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": ".",
     "strict": true,
-    "module": "es2022",
+    "module": "CommonJS",
     "types": ["@citizenfx/server"],
     "declaration": true,
     "sourceMap": true,
@@ -13,7 +14,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "rootDir": ".",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "experimentalDecorators": true,
     "noImplicitAny": false,
     "noEmit": false

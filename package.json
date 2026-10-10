@@ -1,53 +1,43 @@
 {
   "name": "oxmysql",
-  "version": "2.14.3",
+  "version": "2.13.1",
   "description": "FXServer to MySQL communication via node-mysql2",
-  "bugs": "https://github.com/overextended/oxmysql/issues",
-  "license": "LGPL-3.0-or-later",
-  "author": "Overextended",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/overextended/oxmysql.git"
+    "url": "https://github.com/communityox/oxmysql.git"
   },
-  "private": true,
-  "workspaces": [
-    "./web"
-  ],
+  "bugs": "https://github.com/communityox/oxmysql/issues",
+  "author": "Overextended",
+  "license": "LGPL-3.0-or-later",
+  "type": "module",
+  "main": "lib/MySQL.js",
+  "types": "lib/MySQL.d.ts",
   "files": [
     "lib/MySQL.js",
     "lib/MySQL.d.ts"
   ],
-  "type": "module",
-  "main": "lib/MySQL.js",
-  "types": "lib/MySQL.d.ts",
   "scripts": {
-    "build": "bun-tasks bun build:web ::: bun build:root",
-    "build:web": "bun --cwd web vite build",
+    "build": "bun build:root && lerna run build",
     "build:root": "node build.js && cd lib && tsc",
-    "watch": "esbuild --watch --bundle --platform=node --target=node22 src/index.ts --outfile=dist/build.js",
+    "watch": "esbuild --watch --bundle --platform=node --target=node16.9.1 src/index.ts --outfile=dist/build.js",
     "lib": "tsc --project lib/tsconfig.lib.json",
-    "test": "bun test tests/unit",
-    "test:coverage": "bun test tests/unit --coverage",
-    "test:integration": "bun test tests/integration"
+    "bootstrap": "lerna bootstrap",
+    "postinstall": "patch-package && bun bootstrap"
   },
   "dependencies": {
-    "mysql2": "3.24.5",
-    "named-placeholders": "^1.1.6",
+    "mysql2": "3.11.3",
+    "named-placeholders": "^1.1.3",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@citizenfx/server": "2.0.29753-1",
-    "@types/bun": "^1.3.14",
-    "@types/node": "^22.19.19",
-    "bun-tasks": "^0.1.2",
+    "@citizenfx/server": "2.0.5132-1",
+    "@milahu/patch-package": "^6.4.14",
+    "@types/node": "^22.7.4",
     "esbuild": "^0.21.5",
-    "oxfmt": "^0.53.0",
+    "lerna": "^4.0.0",
     "postinstall-postinstall": "^2.1.0",
+    "prettier": "^3.3.3",
     "pretty-quick": "^3.3.1",
-    "typescript": "^6.0.3"
-  },
-  "patchedDependencies": {
-    "named-placeholders@1.1.6": "patches/named-placeholders@1.1.6.patch",
-    "mysql2@3.24.5": "patches/mysql2@3.24.5.patch"
+    "typescript": "^5.6.2"
   }
 }

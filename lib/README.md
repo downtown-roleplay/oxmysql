@@ -6,13 +6,13 @@ Types are fully supported and you will get intellisense on the `oxmysql` object 
 
 ```yaml
 # With pnpm
-pnpm add @overextended/oxmysql
+pnpm add @communityox/oxmysql
 
 # With Yarn
-yarn add @overextended/oxmysql
+yarn add @communityox/oxmysql
 
 # With npm
-npm install @overextended/oxmysql
+npm install @communityox/oxmysql
 ```
 
 ## Usage
@@ -20,35 +20,30 @@ npm install @overextended/oxmysql
 Import as module:
 
 ```js
-import { oxmysql } from '@overextended/oxmysql';
+import { oxmysql } from '@communityox/oxmysql';
 ```
 
 Import with require:
 
 ```js
-const { oxmysql } = require('@overextended/oxmysql');
+const { oxmysql } = require('@communityox/oxmysql');
 ```
 
 ## Documentation
 
-[View documentation](https://overextended.dev/oxmysql)
+[View documentation](https://coxdocs.dev/oxmysql)
 
 ```js
-oxmysql
-  .scalar('SELECT username FROM users', (result) => {
-    console.log(result);
-  })
-  .catch(console.error);
+oxmysql.scalar('SELECT username FROM users', (result) => {
+    console.log(result)
+}).catch(console.error)
 
-oxmysql
-  .scalar('SELECT username FROM users')
-  .then((result) => {
-    console.log(result);
-  })
-  .catch(console.error);
+oxmysql.scalar('SELECT username FROM users').then((result) => {
+    console.log(result)
+}).catch(console.error)
 
-const result = await oxmysql.scalar('SELECT username FROM users').catch(console.error);
-console.log(result);
+const result = await oxmysql.scalar('SELECT username FROM users').catch(console.error)
+console.log(result)
 ```
 
 ## License

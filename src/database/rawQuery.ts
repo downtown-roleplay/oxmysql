@@ -8,7 +8,7 @@ import { getConnection } from './connection';
 import { RowDataPacket } from 'mysql2';
 import { performance } from 'perf_hooks';
 import validateResultSet from 'utils/validateResultSet';
-import { markProfilerUnsupported, runProfiler } from 'profiler';
+import { runProfiler } from 'profiler';
 
 export const rawQuery = async (
   type: QueryType,
@@ -17,7 +17,7 @@ export const rawQuery = async (
   parameters: CFXParameters,
   cb?: CFXCallback,
   isPromise?: boolean,
-  connectionId?: number,
+  connectionId?: number
 ) => {
   cb = setCallback(parameters, cb);
   try {
@@ -26,7 +26,7 @@ export const rawQuery = async (
     return logError(invokingResource, cb, isPromise, err, query, parameters);
   }
 
-  await using connection = await getConnection(connectionId);
+  using connection = await getConnection(connectionId);
 
   if (!connection) return;
 
@@ -36,19 +36,11 @@ export const rawQuery = async (
     const result = await connection.query(query, parameters);
 
     if (hasProfiler) {
-      try {
-        const profiler = <RowDataPacket[]>(
-          await connection.query(
-            'SELECT FORMAT(SUM(DURATION) * 1000, 4) AS `duration` FROM INFORMATION_SCHEMA.PROFILING',
-          )
-        );
+      const profiler = <RowDataPacket[]>(
+        await connection.query('SELECT FORMAT(SUM(DURATION) * 1000, 4) AS `duration` FROM INFORMATION_SCHEMA.PROFILING')
+      );
 
-        if (profiler[0]) logQuery(invokingResource, query, parseFloat(profiler[0].duration), parameters);
-      } catch {
-        // Database doesn't actually support INFORMATION_SCHEMA.PROFILING (e.g. TiDB) even though
-        // the SET profiling statements succeeded; stop trying and skip logging this duration.
-        markProfilerUnsupported();
-      }
+      if (profiler[0]) logQuery(invokingResource, query, parseFloat(profiler[0].duration), parameters);
     } else if (startTime) {
       logQuery(invokingResource, query, performance.now() - startTime, parameters);
     }

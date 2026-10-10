@@ -6,9 +6,9 @@ node_version '22'
 
 name 'oxmysql'
 author 'Overextended'
-version '2.14.3'
+version '2.13.1'
 license 'LGPL-3.0-or-later'
-repository 'git+https://github.com/overextended/oxmysql.git'
+repository 'https://github.com/communityox/oxmysql.git'
 description 'FXServer to MySQL communication via node-mysql2'
 
 dependencies {
@@ -17,13 +17,6 @@ dependencies {
 
 client_script 'ui.lua'
 server_script 'dist/build.js'
-
-files {
-	'web/build/index.html',
-	'web/build/**/*'
-}
-
-ui_page 'web/build/index.html'
 
 provide 'mysql-async'
 provide 'ghmattimysql'

@@ -41,20 +41,10 @@ export function typeCast(field: TypeCastField, next: TypeCastNext) {
       const value = field.string();
       return value ? new Date(value + ' 00:00:00').getTime() : null;
     }
-    case 'TINY': {
-      if (field.length !== 1) return next();
-
-      const value = field.string();
-
-      return value === null ? null : value === '1';
-    }
-    case 'BIT': {
-      const buffer = field.buffer();
-
-      if (!buffer) return null;
-
-      return buffer.length === 1 ? buffer[0] === 1 : buffer[0];
-    }
+    case 'TINY':
+      return field.length === 1 ? field.string() === '1' : next();
+    case 'BIT':
+      return field.length === 1 ? field.buffer()?.[0] === 1 : field.buffer()?.[0];
     case 'TINY_BLOB':
     case 'MEDIUM_BLOB':
     case 'LONG_BLOB':

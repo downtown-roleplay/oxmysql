@@ -1,6 +1,7 @@
 import { getConnectionOptions, mysql_transaction_isolation_level } from 'config';
 import { createPool } from 'mysql2/promise';
 import type { Pool, RowDataPacket } from 'mysql2/promise';
+import { getConnection } from './connection';
 
 export let pool: Pool;
 export let dbVersion = '';
@@ -33,7 +34,7 @@ export async function createConnectionPool() {
     console.log(
       `^3Unable to establish a connection to the database (${err.code})!\n^1Error${
         err.errno ? ` ${err.errno}` : ''
-      }: ${message}^0`,
+      }: ${message}^0`
     );
 
     console.log(`See https://github.com/overextended/oxmysql/issues/154 for more information.`);
