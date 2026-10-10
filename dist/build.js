@@ -139,8 +139,11 @@ var require_lib = __commonJS({
           prev[i2] = i2 - 1;
         }
         free = [];
-        for (let i2 = preserve; i2 < newMax; i2++)
+        for (let i2 = preserve; i2 < newMax; i2++) {
+          keyList[i2] = void 0;
+          valList[i2] = void 0;
           free.push(i2);
+        }
       }, "_shrink");
       const _grow = /* @__PURE__ */ __name((newMax) => {
         keyList.length = newMax;
@@ -325,7 +328,7 @@ var require_lib = __commonJS({
 var require_named_placeholders = __commonJS({
   "node_modules/named-placeholders/index.js"(exports3, module2) {
     "use strict";
-    var RE_PARAM = /(?:\?)|(?:(?<!["'])[:@](\d+|(?:[a-zA-Z][a-zA-Z0-9_]*)))/g;
+    var RE_PARAM = /(?:\?)|(?::(\d+|(?:[a-zA-Z][a-zA-Z0-9_]*)))/g;
     var DQUOTE = 34;
     var SQUOTE = 39;
     var BSLASH = 92;
@@ -407,23 +410,15 @@ var require_named_placeholders = __commonJS({
           throw new Error(
             "Named query contains placeholders, but parameters object is undefined"
           );
-        for (const key in params) {
-          const char = key[0];
-          if (char == "@" || char == ":") {
-            params[key.substring(1)] = params[key];
-            delete params[key];
-          }
-        }
         const tokens = tree[1];
         for (let i2 = 0; i2 < tokens.length; ++i2) {
-          arr.push(params[tokens[i2]] === void 0 ? null : params[tokens[i2]]);
+          arr.push(params[tokens[i2]]);
         }
         return [tree[0], arr];
       }
       __name(toArrayParams, "toArrayParams");
       function noTailingSemicolon(s2) {
-        const char = s2.slice(-1);
-        if (char == ":" || char == "@") {
+        if (s2.slice(-1) === ":") {
           return s2.slice(0, -1);
         }
         return s2;
@@ -435,8 +430,7 @@ var require_named_placeholders = __commonJS({
         }
         let unnamed = noTailingSemicolon(tree[0][0]);
         for (let i2 = 1; i2 < tree[0].length; ++i2) {
-          const char = tree[0][i2 - 1].slice(-1);
-          if (char == ":" || char == "@") {
+          if (tree[0][i2 - 1].slice(-1) === ":") {
             unnamed += config.placeholder;
           }
           unnamed += config.placeholder;
@@ -444,8 +438,7 @@ var require_named_placeholders = __commonJS({
         }
         const last = tree[0][tree[0].length - 1];
         if (tree[0].length === tree[1].length) {
-          const char = last.slice(-1);
-          if (char == ":" || char == "@") {
+          if (last.slice(-1) === ":") {
             unnamed += config.placeholder;
           }
           unnamed += config.placeholder;
@@ -13442,7 +13435,7 @@ var require_encode_parameter = __commonJS({
       let type = Types.VAR_STRING;
       let length;
       let writer = Packet.prototype.writeLengthCodedBuffer;
-      if (value != null) {
+      if (value !== null) {
         switch (typeof value) {
           case "undefined":
             throw new TypeError("Bind parameters must not contain undefined");
@@ -16244,7 +16237,6 @@ var require_text_parser = __commonJS({
           db: field.schema,
           table: field.table,
           name: field.name,
-          charset: field.characterSet,
           string: /* @__PURE__ */ __name(function(encoding = field.encoding) {
             if (field.columnType === Types.JSON && encoding === field.encoding) {
               console.warn(
@@ -17516,7 +17508,7 @@ var require_binary_parser = __commonJS({
           return unsigned ? "packet.readInt64();" : "packet.readSInt64();";
         default:
           if (field.characterSet === Charsets.BINARY) {
-            return "[...packet.readLengthCodedBuffer()];";
+            return "packet.readLengthCodedBuffer();";
           }
           return `packet.readLengthCodedString(fields[${fieldNum}].encoding)`;
       }
@@ -17533,8 +17525,7 @@ var require_binary_parser = __commonJS({
           length: field.columnLength,
           db: field.schema,
           table: field.table,
-          name: field.name,
-          charset: field.characterSet
+          name: field.name
         };
       }
       __name(fieldMetadata, "fieldMetadata");
@@ -19432,7 +19423,9 @@ var require_connection = __commonJS({
               );
             }
             if (val === void 0) {
-              val = null;
+              throw new TypeError(
+                "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+              );
             }
             if (typeof val === "function") {
               throw new TypeError(

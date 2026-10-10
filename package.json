@@ -9,6 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/overextended/oxmysql.git"
   },
+  "private": true,
   "workspaces": [
     "./web"
   ],
